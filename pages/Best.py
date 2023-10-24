@@ -5,6 +5,8 @@ import load.calculate_table
 
 def show_table():
 
+    st.title("Various stats on the best drivers")
+
     st.header(f"Drivers: Most points by round")
     st.write(f"Multipliers shown are the multipliers for the driver on that round. More points could be scored if the driver was already contracted at a higher multiplier.")
 
@@ -36,8 +38,27 @@ def show_table():
         order by s.round, multiplier_points desc
     """
     
-    st.dataframe(duckdb.sql(sql).df(), height = 800, width = 700)
+    st.dataframe(duckdb.sql(sql).df())
 
+
+    st.header("Drivers: total points")
+    st.write("Multipliers shown are the multipliers for the driver on the first round (round 14). Total points are for round 14 onwards.")
+
+    sql = """
+        select
+            s.driver,
+            m.multiplier,
+            sum(s.points_this_round) as total_points,
+            sum(round(s.points_this_round * m.multiplier)) as multiplier_points,
+        from standing s
+        join multiplier m on m.driver = s.driver
+            and m.round = 14
+        where s.round between 14 and (select max(round) from standing)
+        group by all
+        order by multiplier_points desc, m.multiplier, s.driver
+    """
+    
+    st.dataframe(duckdb.sql(sql).df())
 
 
 if __name__ == "__main__":
