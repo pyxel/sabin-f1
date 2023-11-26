@@ -33,5 +33,4 @@ def show_table():
 if __name__ == "__main__":
     load.calculate_table.main()
     st.header("Current standing")
-    st.text("Provisional standings at lap 15 of Abu Dhabi")
     show_table()
